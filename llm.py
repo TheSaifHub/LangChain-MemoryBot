@@ -12,7 +12,7 @@ import streamlit as st
 # groq_api_key = os.getenv("GROQ_API_KEY")
 
 # ---------------- Load API Key for deploying on streamlit ----------------
-groq_api_key = st.secrets["GROQ_API_KEY"]
+groq_api_key = st.secrets["API_KEY"]
 
 # ---------------- Validate API Key ----------------
 if not groq_api_key:
