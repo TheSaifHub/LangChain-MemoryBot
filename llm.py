@@ -6,10 +6,11 @@ import streamlit as st
 # from dotenv import load_dotenv
 # import os
 
-# Load environment variables
+# # Load environment variables
 # load_dotenv()
 
-# groq_api_key = os.getenv("GROQ_API_KEY")
+# groq_api_key = os.getenv("API_KEY")
+# print("API KEY:", groq_api_key)
 
 # ---------------- Load API Key for deploying on streamlit ----------------
 groq_api_key = st.secrets["API_KEY"]
