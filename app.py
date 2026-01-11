@@ -1,98 +1,3 @@
-# from chain import get_conversation_chain
-
-# print("✅ LangChainMemoryBot started")
-# print("Type 'exit' to quit.\n")
-
-# # Ask user for a username (used as session_id)
-# user_id = input("Enter your username: ")
-
-# # Create conversation with user-specific memory
-# conversation = get_conversation_chain(session_id=user_id)
-
-# while True:
-#     query = input("\nYou: ")
-
-#     if query.lower() in ["exit", "quit", "bye"]:
-#         print("Bot: Bye bro! See you 👋")
-#         break
-
-#     response = conversation.predict(input=query)
-#     print("Bot:", response)
-
-# import streamlit as st
-# from chain import get_conversation_chain
-
-# # ---------------- Page Config ----------------
-# st.set_page_config(
-#     page_title="LangChain MemoryBot",
-#     page_icon="🤖",
-#     layout="centered"
-# )
-
-# # ---------------- Title ----------------
-# st.title("🤖 LangChain MemoryBot")
-# st.caption("Persistent AI Chatbot using LangChain + ChatGroq")
-
-# # ---------------- Sidebar ----------------
-# with st.sidebar:
-#     st.header("👤 User Session")
-#     user_id = st.text_input("Enter your username", placeholder="e.g. saif")
-#     button_start = st.button("Start Chatting")
-#     st.markdown("---")
-#     st.markdown("### ℹ️ How it works")
-#     st.markdown(
-#         """
-#         - Each user has **separate memory**
-#         - Conversations are stored in a **database**
-#         - Bot remembers you even after restart
-#         """
-#     )
-
-# # ---------------- Session State ----------------
-# if "conversation" not in st.session_state:
-#     st.session_state.conversation = None
-
-# if "messages" not in st.session_state:
-#     st.session_state.messages = []
-
-# # ---------------- Start Chat ----------------
-# if button_start and user_id:
-#     st.session_state.conversation = get_conversation_chain(session_id=user_id)
-#     st.success(f"Session started for **{user_id}**")
-
-# # ---------------- Chat UI ----------------
-# if st.session_state.conversation:
-
-#     # Display previous messages
-#     for role, message in st.session_state.messages:
-#         with st.chat_message("user" if role == "user" else "assistant"):
-#             st.markdown(message)
-
-#     # Chat input
-#     user_input = st.chat_input("Type your message...")
-
-#     if user_input:
-#         # Show user message
-#         with st.chat_message("user"):
-#             st.markdown(user_input)
-
-#         # Save user message
-#         st.session_state.messages.append(("user", user_input))
-
-#         # Get response from LangChain
-#         response = st.session_state.conversation.predict(input=user_input)
-
-#         # Show bot message
-#         with st.chat_message("assistant"):
-#             st.markdown(response)
-
-#         # Save bot message
-#         st.session_state.messages.append(("assistant", response))
-
-# else:
-#     st.info("👈 Enter your username in the sidebar to start chatting.")
-
-
 import streamlit as st
 from chain import get_conversation_chain
 import sqlite3
@@ -107,8 +12,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# ---------------- Database Export Functions ----------------
-# (Kept exactly the same as your code)
+# ---------------- Database Functions ----------------
 def parse_message(msg):
     try:
         if isinstance(msg, dict):
@@ -149,7 +53,7 @@ def get_all_chats():
         st.error(f"Error reading database: {e}")
         return None
 
-# ---------------- Session State Initialization ----------------
+# ---------------- Session State ----------------
 if "user_id" not in st.session_state:
     st.session_state.user_id = None
 
@@ -162,32 +66,63 @@ if "messages" not in st.session_state:
 if "export_df" not in st.session_state:
     st.session_state.export_df = None
 
-# ---------------- LOGIC FLOW ----------------
+# ==========================================
+#              LOGIC FLOW
+# ==========================================
 
-# CASE 1: USER IS NOT LOGGED IN (Show Login Screen on Main Page)
+# CASE 1: USER IS NOT LOGGED IN (Login Screen)
 if not st.session_state.user_id:
     
     st.title("🤖 LangChain MemoryBot")
     st.markdown("### Welcome! 👋")
     st.write("Please enter your username to continue your conversation.")
 
-    # Create a clean form for login
+    # Login Form
     with st.form("login_form"):
         username_input = st.text_input("Username", placeholder="e.g. saif")
         submit_button = st.form_submit_button("Start Chatting")
 
     if submit_button and username_input:
-        # Save user to session
         st.session_state.user_id = username_input
-        # Initialize Chain
         with st.spinner("Loading memory..."):
             st.session_state.conversation = get_conversation_chain(session_id=username_input)
-            time.sleep(1) # UX pause
-        st.rerun() # Refresh to show chat interface
+            time.sleep(1) 
+        st.rerun()
 
-# CASE 2: USER IS LOGGED IN (Show Chat UI)
+    # --- FOOTER FOR LOGIN SCREEN (Fixed to Bottom, No Scroll) ---
+    st.markdown(
+        """
+        <style>
+        .footer-login {
+            position: fixed;
+            left: 0;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            pointer-events: none; /* Allows clicking through empty space */
+        }
+        .footer-login a {
+            color: #888;
+            text-decoration: none;
+            pointer-events: auto; /* Re-enable clicks on links */
+        }
+        .footer-login a:hover {
+            color: #555;
+            text-decoration: underline;
+        }
+        </style>
+        <div class="footer-login">
+            <p>Copyright © 2025 LangChain MemoryBot | Made with ❤️ by <a href="https://saifibrahim.netlify.app/" target="_blank"><b>Saif Ibrahim</b></a></p>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+# CASE 2: USER IS LOGGED IN (Chat UI)
 else:
-    # --- Sidebar for Tools (Only visible when logged in) ---
+    # --- Sidebar (Tools + Footer) ---
     with st.sidebar:
         st.header(f"👤 {st.session_state.user_id}")
         
@@ -219,7 +154,6 @@ else:
                 else:
                     st.toast("No DB data found.")
 
-        # Download Button (Appears if data is ready)
         if st.session_state.export_df is not None:
             st.markdown("---")
             csv = st.session_state.export_df.to_csv(index=False).encode("utf-8")
@@ -229,30 +163,39 @@ else:
                 file_name=st.session_state.export_filename,
                 mime="text/csv",
             )
+        
+        # --- FOOTER FOR CHAT SCREEN (Inside Sidebar) ---
+        # Moving it here prevents overlap with the chat input on mobile
+        st.markdown("---")
+        st.markdown(
+            """
+            <div style="text-align: center; color: #888; font-size: 13px;">
+                <p>Copyright © 2025 LangChain MemoryBot</p>
+                <p>Made with ❤️ by <a href="https://saifibrahim.netlify.app/" target="_blank" style="color: #888;"><b>Saif Ibrahim</b></a></p>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
-    # --- Main Chat Interface ---
+    # --- Main Chat Area ---
     st.subheader(f"Chatting as: {st.session_state.user_id}")
     
-    # Display previous messages
+    # Display Messages
     for role, message in st.session_state.messages:
         with st.chat_message("user" if role == "user" else "assistant"):
             st.markdown(message)
 
-    # Chat input
+    # Chat Input
     user_input = st.chat_input("Type your message...")
 
     if user_input:
-        # 1. Display User Message
         with st.chat_message("user"):
             st.markdown(user_input)
         st.session_state.messages.append(("user", user_input))
 
-        # 2. Generate Response
         if st.session_state.conversation:
             with st.chat_message("assistant"):
                 with st.spinner("Thinking..."):
                     response = st.session_state.conversation.predict(input=user_input)
                     st.markdown(response)
-            
-            # 3. Save Assistant Message
             st.session_state.messages.append(("assistant", response))
