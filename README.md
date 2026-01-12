@@ -32,6 +32,7 @@ LangChainMemoryBot/
 ├── .env              # API key (not committed)
 ├── requirements.txt
 └── README.md
+```
 
 ------------------------------------------------------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ This enables the chatbot to remember personal details like names, preferences, a
 ⚙️ Installation
 
 1️⃣ Clone the Repository
-git clone [https://github.com/your-username/LangChainMemoryBot.git](https://github.com/TheSaifHub/LangChain-MemoryBot.git)
+git clone [https://github.com//LangChainMemoryBot.git](https://github.com/TheSaifHub/LangChain-MemoryBot.git)
 cd LangChainMemoryBot
 
 2️⃣ Create Virtual Environment (Recommended)
