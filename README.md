@@ -20,6 +20,7 @@ It remembers user information across sessions using a SQLite database, enabling 
 ------------------------------------------------------------------------------------------------------------------
 
 🏗️ Project Structure
+
 LangChainMemoryBot/
 │
 ├── app.py            # Streamlit UI
